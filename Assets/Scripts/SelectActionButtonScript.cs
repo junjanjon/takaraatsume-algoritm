@@ -54,7 +54,6 @@ public class SelectActionButtonScript : MonoBehaviour
 
     private void EventCatch(string buttonName)
     {
-        Debug.Log(buttonName);
         if (_callback != null)
         {
             _callback(buttonName);
