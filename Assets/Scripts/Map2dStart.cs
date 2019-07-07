@@ -111,6 +111,21 @@ public class Map2dStart : MonoBehaviour
         public int Height;
         public int[] Data;
 
+        public MapData(int width, int height, int[] data)
+        {
+            Width = width;
+            Height = height;
+            Data = data;
+        }
+
+        public MapData(MapData mapData)
+        {
+            Width = mapData.Width;
+            Height = mapData.Height;
+            Data = new int[mapData.Data.Length];
+            mapData.Data.CopyTo(Data, 0);
+        }
+
         public int FindPlayerStartIndex()
         {
             return Data.ToList().IndexOf(-1);
