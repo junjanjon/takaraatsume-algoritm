@@ -20,8 +20,8 @@ public class SelectActionButtonScript : MonoBehaviour
         var actionButtons = GetComponentsInChildren<Button>();
         foreach (var actionButton in actionButtons)
         {
-            actionButton.enabled = false;
             actionButton.interactable = false;
+            actionButton.image.color = Color.gray;
         }
     }
 
@@ -40,8 +40,8 @@ public class SelectActionButtonScript : MonoBehaviour
         var actionButtons = GetComponentsInChildren<Button>();
         foreach (var actionButton in actionButtons)
         {
-            actionButton.enabled = true;
             actionButton.interactable = true;
+            actionButton.image.color = Color.white;
 
             var clickedEvent = new Button.ButtonClickedEvent();
             clickedEvent.AddListener(() =>

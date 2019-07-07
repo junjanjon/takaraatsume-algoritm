@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameStart : MonoBehaviour
@@ -22,9 +23,18 @@ public class GameStart : MonoBehaviour
     }
 
     private State current = State.Edit;
+    private int _stageId = 0;
 
     private void Start()
     {
+        _stageId = TitleStart.SELECT_STAGE_ID_KEY;
+        
+        if (_stageId == 0)
+        {
+            SceneManager.LoadSceneAsync(TitleStart.DefineScene[TitleStart.Scene.TITLE], LoadSceneMode.Single);
+            return;
+        }
+
         MapReset();
     }
 
@@ -38,13 +48,27 @@ public class GameStart : MonoBehaviour
                 MapReset();
             });
             button.onClick = clickedEvent;
+            var image = GameObject.Find("StartButton").GetComponent<Image>();
+            image.color = Color.red;
+            var text = GameObject.Find("StartButton").GetComponentInChildren<Text>();
+            text.text = "RETRY";
+            text.color = Color.white;
+        }
+        {
+            var button = GameObject.Find("ExitButton").GetComponent<Button>();
+            var clickedEvent = new Button.ButtonClickedEvent();
+            clickedEvent.AddListener(() =>
+            {
+                SceneManager.LoadSceneAsync(TitleStart.DefineScene[TitleStart.Scene.TITLE], LoadSceneMode.Single);
+            });
+            button.onClick = clickedEvent;
         }
         
         _selectActionButtonScript = GameObject.Find("SelectActionButton").GetComponent<SelectActionButtonScript>();
         _selectActionButtonScript.OnPlayStart();
 
         _map2d = GameObject.Find("Map2d").GetComponent<Map2dStart>();
-        _map2d.SetMapData(MapDatabase.LoadMapDataByStageId(1));
+        _map2d.SetMapData(MapDatabase.LoadMapDataByStageId(_stageId));
         _map2d.PlayStart(_algorithmList.Select((id => _hashList[id])).ToList());
         current = State.Play;
     }
@@ -59,6 +83,20 @@ public class GameStart : MonoBehaviour
                 MapStart();
             });
             button.onClick = clickedEvent;
+            var image = GameObject.Find("StartButton").GetComponent<Image>();
+            image.color = Color.blue;
+            var text = GameObject.Find("StartButton").GetComponentInChildren<Text>();
+            text.text = "START";
+            text.color = Color.white;
+        }
+        {
+            var button = GameObject.Find("ExitButton").GetComponent<Button>();
+            var clickedEvent = new Button.ButtonClickedEvent();
+            clickedEvent.AddListener(() =>
+            {
+                SceneManager.LoadSceneAsync(TitleStart.DefineScene[TitleStart.Scene.TITLE], LoadSceneMode.Single);
+            });
+            button.onClick = clickedEvent;
         }
 
         _selectActionButtonScript = GameObject.Find("SelectActionButton").GetComponent<SelectActionButtonScript>();
@@ -66,7 +104,7 @@ public class GameStart : MonoBehaviour
         _selectActionButtonScript.Callback = GetSelectActionButtonEvent;
 
         _map2d = GameObject.Find("Map2d").GetComponent<Map2dStart>();
-        _map2d.SetMapData(MapDatabase.LoadMapDataByStageId(1));
+        _map2d.SetMapData(MapDatabase.LoadMapDataByStageId(_stageId));
         current = State.Edit;
     }
         
