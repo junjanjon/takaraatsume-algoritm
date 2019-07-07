@@ -6,6 +6,13 @@ using UnityEngine.UI;
 
 public class SelectActionButtonScript : MonoBehaviour
 {
+    private Action<string> _callback = null;
+
+    public Action<string> Callback
+    {
+        set => _callback = value;
+    }
+
 
     public void OnPlayStart()
     {
@@ -48,5 +55,9 @@ public class SelectActionButtonScript : MonoBehaviour
     private void EventCatch(string buttonName)
     {
         Debug.Log(buttonName);
+        if (_callback != null)
+        {
+            _callback(buttonName);
+        }
     }
 }

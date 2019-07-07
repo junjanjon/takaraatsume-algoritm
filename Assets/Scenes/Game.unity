@@ -295,7 +295,7 @@ GameObject:
   - component: {fileID: 173759343}
   - component: {fileID: 173759342}
   m_Layer: 5
-  m_Name: Algorithm
+  m_Name: AlgorithmList
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -474,8 +474,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 213836750}
+  - component: {fileID: 213836751}
+  - component: {fileID: 213836752}
   m_Layer: 5
-  m_Name: Content
+  m_Name: AlgorithmListContents
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -500,6 +502,43 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
+--- !u!114 &213836751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 213836749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1297475563, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+--- !u!114 &213836752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 213836749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1741964061, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 1
+  m_VerticalFit: 2
 --- !u!1 &351608169
 GameObject:
   m_ObjectHideFlags: 0
@@ -2040,7 +2079,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 175415145}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.8317065
+  m_Size: 0.86248624
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2587,7 +2626,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2096282679}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 317.53632, y: 145.23859, z: 63.18701}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2605,3 +2644,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f071b501f69423886398b7e4a7d25c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _linePrefab: {fileID: 7760578016790819107, guid: 0384b45728c694e1cb630a7ed7730a68,
+    type: 3}
+  _previewAlgorithmList: []
