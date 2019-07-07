@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace DefaultNamespace
@@ -23,6 +24,9 @@ namespace DefaultNamespace
             _selectActionButtonScript = GameObject.Find("SelectActionButton").GetComponent<SelectActionButtonScript>();
             _selectActionButtonScript.OnEditStart();
             _selectActionButtonScript.Callback = GetSelectActionButtonEvent;
+
+
+            SceneManager.LoadSceneAsync("Map2d", LoadSceneMode.Additive);
         }
         
 
