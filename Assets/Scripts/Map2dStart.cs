@@ -12,8 +12,13 @@ public class Map2dStart : MonoBehaviour
     private Sprite _holeSprite;
     [SerializeField]
     private Sprite _goalSprite;
+    [SerializeField]
+    private Sprite _treasureSprite;
+    [SerializeField]
+    private Sprite _treasureSprite2;
 
-    [SerializeField] private Sprite[] _playerSprites;
+    [SerializeField]
+    private Sprite[] _playerSprites;
     
     private Texture2D[] _textures = null;
     private Texture2D[] _playerTextures = null;
@@ -41,6 +46,8 @@ public class Map2dStart : MonoBehaviour
             _greenSprite,
             _holeSprite,
             _goalSprite,
+            _treasureSprite,
+            _treasureSprite2,
         };
             
         _textures = sprites.Select((delegate(Sprite sprite)
@@ -68,6 +75,15 @@ public class Map2dStart : MonoBehaviour
         })).ToArray();
     }
 
+    public class MapData
+    {
+        public int Width;
+        public int Height;
+        public int[] Data;
+    }
+
+    private MapData _mapData = null;
+
     void OnGUI()
     {
         if (_textures == null)
@@ -75,14 +91,69 @@ public class Map2dStart : MonoBehaviour
             return;
         }
 
+        if (_mapData == null)
+        {
+            _mapData = MapDatabase.LoadMapDataByStageId(5);
+        }
+
         UpdatePlayerTimer();
+        DrawMap();
+    }
+
+    private void DrawMap()
+    {
+        for (int i = 0; i < _mapData.Width * _mapData.Height; i++)
+        {
+            DrawMapTip(i);
+        }
+    }
+    
+    private void DrawMapTip(int index)
+    {
+        GUI.DrawTexture(GetMapTipRect(index), _textures[0]);
         
-        var startCamera = new Vector2(Screen.width * 0.3f, 0);
-        var cellSize = new Vector2(Screen.height * 0.08f, Screen.height * 0.08f);
-            
-        GUI.DrawTexture(new Rect(startCamera, cellSize), _textures[0]);
-        GUI.DrawTexture(new Rect(startCamera, cellSize), _textures[1]);
-        GUI.DrawTexture(new Rect(startCamera, cellSize), _textures[2]);
-        GUI.DrawTexture(new Rect(startCamera, cellSize), _playerTextures[GetPlayerAnimeIndex()]);
+        
+        if (_mapData.Data[index] == 1)
+        {
+            GUI.DrawTexture(GetMapTipRect(index), _textures[2]);
+        }
+        if (_mapData.Data[index] == 2)
+        {
+            GUI.DrawTexture(GetMapTipRect(index), _textures[1]);
+        }
+        if (_mapData.Data[index] == 3)
+        {
+            GUI.DrawTexture(GetMapTipRect(index), _textures[3]);
+        }
+        if (_mapData.Data[index] == 4)
+        {
+            GUI.DrawTexture(GetMapTipRect(index), _textures[4]);
+        }
+        
+        // GUI.DrawTexture(GetMapTipRect(mapData, index), _playerTextures[GetPlayerAnimeIndex()]);
+    }
+    
+    private Rect GetMapTipRect(int index)
+    {
+        return new Rect(GetMapTipPosition(index), GetCellSize());
+    }
+
+    private Vector2 GetMapTipPosition(int index)
+    {
+        int x = index % _mapData.Width;
+        int y = index / _mapData.Width;
+
+        var f = GetCenter() + new Vector2((x - _mapData.Width / 2) * GetCellSize().x, (y - _mapData.Height / 2) * GetCellSize().y);
+        return f;
+    }
+
+    private Vector2 GetCenter()
+    {
+        return new Vector2(Screen.width * 0.3f + (Screen.width * 0.7f * 0.5f), Screen.height * 0.8f * 0.5f);
+    }
+
+    private Vector2 GetCellSize()
+    {
+        return new Vector2(Screen.height * 0.08f, Screen.height * 0.08f);
     }
 }
