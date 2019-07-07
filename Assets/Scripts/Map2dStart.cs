@@ -22,9 +22,22 @@ public class Map2dStart : MonoBehaviour
     
     private Texture2D[] _textures = null;
     private Texture2D[] _playerTextures = null;
+
+    private int playerIndex = 0;
+    private int goalIndex = 0;
     private int playerDirection = 0; // 0: down, +1 : turn right
     private int playerAnime = 0;
     private int playerTimer = 0;
+    private int playerWalkTimer = 0;
+    
+    private enum PlayState 
+    {
+        Playing,
+        Success,
+        Failled,
+    }
+
+    private PlayState current = PlayState.Playing;
 
     private int GetPlayerAnimeIndex()
     {
@@ -37,6 +50,23 @@ public class Map2dStart : MonoBehaviour
         playerTimer = (playerTimer + 1) % (4 * Span);
         var animeSpanTime = playerTimer / Span;
         playerAnime = (animeSpanTime == 3) ? 1 : animeSpanTime;
+    }
+
+
+    private int _actionSpan = 100;
+
+    private bool UpdatePlayerWalkTimer(out float lerp)
+    {
+        playerWalkTimer = playerWalkTimer + 1;
+        lerp = playerWalkTimer * 1.0f / _actionSpan;
+        
+        if (_actionSpan < playerWalkTimer)
+        {
+            playerWalkTimer = 0;
+            return true;
+        }
+
+        return false;
     }
 
     private void Start()
@@ -80,9 +110,37 @@ public class Map2dStart : MonoBehaviour
         public int Width;
         public int Height;
         public int[] Data;
+
+        public int FindPlayerStartIndex()
+        {
+            return Data.ToList().IndexOf(-1);
+        }
+
+        public int FindGoalIndex()
+        {
+            return Data.ToList().IndexOf(1);
+        }
+    }
+    
+    private MapData _mapData = null;
+
+    public void SetMapData(MapData mapData)
+    {
+        _mapData = mapData;
+        playerIndex = _mapData.FindPlayerStartIndex();
+        playerDirection = 0;
+        goalIndex = _mapData.FindGoalIndex();
+        _algorithmList = null;
     }
 
-    private MapData _mapData = null;
+    private List<string> _algorithmList = null;
+
+    public void PlayStart(List<string> algorithmList)
+    {
+        _algorithmList = algorithmList;
+        playerWalkTimer = 0;
+        current = PlayState.Playing;
+    }
 
     void OnGUI()
     {
@@ -93,11 +151,149 @@ public class Map2dStart : MonoBehaviour
 
         if (_mapData == null)
         {
-            _mapData = MapDatabase.LoadMapDataByStageId(5);
+            return;
         }
 
         UpdatePlayerTimer();
         DrawMap();
+        
+        if (_algorithmList == null)
+        {
+            GUI.DrawTexture(GetMapTipRect(playerIndex), _playerTextures[GetPlayerAnimeIndex()]);
+        }
+        else
+        {
+            var message = (current == PlayState.Playing) ? "プレイ中" : (current == PlayState.Success) ? "クリア！" : "ざんねん";
+            GUI.Label(new Rect(Screen.width * 0.3f, 0, Screen.width * 0.5f, Screen.height * 0.05f), message, new GUIStyle
+            {
+                fontSize = (int)(Screen.height * 0.05f)
+            });
+            
+            if (_algorithmList.Count == 0 || current != PlayState.Playing)
+            {
+                GUI.DrawTexture(GetMapTipRect(playerIndex), _playerTextures[GetPlayerAnimeIndex()]);
+                return;
+            }
+
+            if (UpdatePlayerWalkTimer(out float lerp))
+            {
+                if (_algorithmList[0] == "TurnLeft")
+                {
+                    playerDirection = (playerDirection + 4 - 1) % 4;
+                }
+                if (_algorithmList[0] == "TurnRight")
+                {
+                    playerDirection = (playerDirection + 1) % 4;
+                }
+                if (_algorithmList[0] == "Treasure")
+                {
+                    if (_mapData.Data[playerIndex] == 3)
+                    {
+                        _mapData.Data[playerIndex] = 4;
+                    }
+                    else
+                    {
+                        // 敗北判定
+                        current = PlayState.Failled;
+                    }
+                }
+                if (_algorithmList[0] == "Walk")
+                {
+                    if (!TryGetMovedIndex(_mapData, playerIndex, playerDirection, 1, out int nowIndex))
+                    {
+                        // 敗北判定
+                        current = PlayState.Failled;
+                    }
+                    else
+                    {
+                        playerIndex = nowIndex;
+                    }
+                    
+                    if (playerIndex < 0 || _mapData.Data.Length <= playerIndex)
+                    {
+                        // 敗北判定
+                        current = PlayState.Failled;
+                    }
+                    else if (_mapData.Data[playerIndex] == 2)
+                    {
+                        // 敗北判定
+                        current = PlayState.Failled;
+                    }
+                }
+                if (_algorithmList[0] == "Jump")
+                {
+                    if (!TryGetMovedIndex(_mapData, playerIndex, playerDirection, 2, out int nowIndex))
+                    {
+                        // 敗北判定
+                        current = PlayState.Failled;
+                    }
+                    else
+                    {
+                        playerIndex = nowIndex;
+                    }
+
+                    if (playerIndex < 0 || _mapData.Data.Length <= playerIndex)
+                    {
+                        // 敗北判定
+                        current = PlayState.Failled;
+                    }
+                    else if (_mapData.Data[playerIndex] == 2)
+                    {
+                        // 敗北判定
+                        current = PlayState.Failled;
+                    }
+                }
+
+                _algorithmList.RemoveAt(0);
+
+                if (_algorithmList.Count == 0)
+                {
+                    if (playerIndex < 0 || _mapData.Data.Length <= playerIndex)
+                    {
+                        // 敗北判定
+                        current = PlayState.Failled;
+                    }
+                    else if (_mapData.Data[playerIndex] == 1)
+                    {
+                        // 勝利判定
+                        current = PlayState.Success;
+                    }
+                    else
+                    {
+                        // 敗北判定
+                        current = PlayState.Failled;
+                    }
+                    return;
+                }
+                _actionSpan = 30;
+                return;
+            }
+
+            var nextPlayerIndex = playerIndex;
+            if (_algorithmList[0] == "Walk")
+            {
+                _actionSpan = 100;
+                if (!TryGetMovedIndex(_mapData, playerIndex, playerDirection, 1, out nextPlayerIndex))
+                {
+                    nextPlayerIndex = playerIndex;
+                }
+            }
+            if (_algorithmList[0] == "Jump")
+            {
+                _actionSpan = 30;
+                if (!TryGetMovedIndex(_mapData, playerIndex, playerDirection, 2, out nextPlayerIndex))
+                {
+                    nextPlayerIndex = playerIndex;
+                }
+            }
+            
+
+            var rect = new Rect(
+                    Vector2.Lerp(GetMapTipPosition(playerIndex), GetMapTipPosition(nextPlayerIndex), lerp),
+                    GetCellSize());
+            
+            GUI.DrawTexture(rect, _playerTextures[GetPlayerAnimeIndex()]);
+        }
     }
 
     private void DrawMap()
@@ -106,6 +302,46 @@ public class Map2dStart : MonoBehaviour
         {
             DrawMapTip(i);
         }
+
+    }
+
+    private static bool TryGetMovedIndex(MapData mapData, int index, int direction, int distanxe, out int nextIndex)
+    {
+        nextIndex = index;
+        
+        if (direction == 0)
+        {
+            nextIndex = index + mapData.Width * +distanxe;
+        }
+        if (direction == 1)
+        {
+            nextIndex = index + 1 * -distanxe;
+
+            if (nextIndex / mapData.Width != index / mapData.Width)
+            {
+                return false;
+            }
+        }
+        if (direction == 2)
+        {
+            nextIndex = index + mapData.Width * -distanxe;
+        }
+        if (direction == 3)
+        {
+            nextIndex = index + 1 * +distanxe;
+
+            if (nextIndex / mapData.Width != index / mapData.Width)
+            {
+                return false;
+            }
+        }
+
+        if (nextIndex < 0 || mapData.Data.Length <= nextIndex)
+        {
+            return false;
+        }
+
+        return true;
     }
     
     private void DrawMapTip(int index)
@@ -129,8 +365,6 @@ public class Map2dStart : MonoBehaviour
         {
             GUI.DrawTexture(GetMapTipRect(index), _textures[4]);
         }
-        
-        // GUI.DrawTexture(GetMapTipRect(mapData, index), _playerTextures[GetPlayerAnimeIndex()]);
     }
     
     private Rect GetMapTipRect(int index)
