@@ -157,6 +157,9 @@ public class Map2dStart : MonoBehaviour
         current = PlayState.Playing;
     }
 
+    [SerializeField]
+    private Font _font;
+
     void OnGUI()
     {
         if (_textures == null)
@@ -181,7 +184,8 @@ public class Map2dStart : MonoBehaviour
             var message = (current == PlayState.Playing) ? "プレイ中" : (current == PlayState.Success) ? "クリア！" : "ざんねん";
             GUI.Label(new Rect(Screen.width * 0.3f, 0, Screen.width * 0.5f, Screen.height * 0.05f), message, new GUIStyle
             {
-                fontSize = (int)(Screen.height * 0.05f)
+                fontSize = (int)(Screen.height * 0.05f),
+                font = _font
             });
             
             if (_algorithmList.Count == 0 || current != PlayState.Playing)

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2774040203039574355}
   - component: {fileID: 2774040203039574352}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Map2d
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -61,3 +61,4 @@ MonoBehaviour:
   - {fileID: 21300012, guid: f947f7be4a2314c6aa9092395fb12208, type: 3}
   - {fileID: 21300014, guid: f947f7be4a2314c6aa9092395fb12208, type: 3}
   - {fileID: 21300016, guid: f947f7be4a2314c6aa9092395fb12208, type: 3}
+  _font: {fileID: 12800000, guid: fb17b9bbb316b4c1c88a6802f4734916, type: 3}
