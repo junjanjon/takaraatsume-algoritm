@@ -8,7 +8,7 @@ jobs:
     executor: unity
     steps:
       - checkout
-      - run: openssl aes-256-cbc -d -in .circleci/Unity_v2018.x.ulf-cipher -out .circleci/Unity_v2018.x.ulf -k ${CIPHER_KEY} -md md5
+      - run: openssl enc -d -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -salt -in ./Unity_v2018.x.ulf-cipher -out ./Unity_v2018.x.ulf-test  -pass pass:${CIPHER_KEY}
       - run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile .circleci/Unity_v2018.x.ulf || exit 0
       - run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -noUpm -logFile -projectPath . -executeMethod Build.IosBuild
       - store_artifacts:
