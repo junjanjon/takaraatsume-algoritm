@@ -42,12 +42,17 @@ jobs:
   unity-build:
     runs-on: ubuntu-latest
     container: unityci/editor:ubuntu-2020.3.4f1-linux-il2cpp-0.15.0
+    env:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
     steps:
+      - run: |
+          echo "$UNITY_LICENSE" > .ulf
+          unity-editor -nographics -logFile /dev/stdout -manualLicenseFile .ulf || :
       - uses: actions/checkout@v2
       - name: Create sln file
         run: unity-editor -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: dist-webgl
-          path: beef.sln
+          name: dist-sln
+          path: *.sln
