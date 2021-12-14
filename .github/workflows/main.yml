@@ -55,4 +55,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: dist-sln
-          path: *.sln
+          path: takaraatsume-algoritm.sln
