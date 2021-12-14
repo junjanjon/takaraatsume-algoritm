@@ -40,7 +40,8 @@ jobs:
   #         path: |
   #           webgl
   unity-build:
-    runs-on: unityci/editor:ubuntu-2020.3.4f1-linux-il2cpp-0.15.0
+    # runs-on: ubuntu-latest
+    container: unityci/editor:ubuntu-2020.3.4f1-linux-il2cpp-0.15.0
     steps:
       - uses: actions/checkout@v2
       - name: Create sln file
