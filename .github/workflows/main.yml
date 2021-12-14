@@ -10,32 +10,49 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-    inputs:
-      release:
-        type: boolean
-        description: Is Release?
-        default: false
+    # inputs:
+    #   release:
+    #     type: boolean
+    #     description: Is Release?
+    #     default: false
       # environment:
       #   type: environment
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build:
-    runs-on: self-hosted
-    environment: ${{ github.event.inputs.environment }}
+  # build:
+  #   runs-on: self-hosted
+  #   environment: ${{ github.event.inputs.environment }}
+  #   steps:
+  #     - name: Show inputs
+  #       run: |
+  #         echo "release: ${{ github.event.inputs.release }}"
+
+  #     - uses: actions/checkout@v2
+
+  #     - name: Run a one-line script
+  #       run: make build_webgl
+
+  #     - name: Archive production artifacts
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: dist-webgl
+  #         path: |
+  #           webgl
+  unity-build:
+    runs-on: ubuntu-latest
+    container: unityci/editor:ubuntu-2020.3.4f1-linux-il2cpp-0.15.0
+    env:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
     steps:
-      - name: Show inputs
-        run: |
-          echo "release: ${{ github.event.inputs.release }}"
-
+      - run: |
+          echo "$UNITY_LICENSE" > .ulf
+          unity-editor -nographics -logFile /dev/stdout -manualLicenseFile .ulf || :
       - uses: actions/checkout@v2
-
-      - name: Run a one-line script
-        run: make build_webgl
-
+      - name: Create sln file
+        run: unity-editor -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: dist-webgl
-          path: |
-            webgl
+          name: dist-sln
+          path: takaraatsume-algoritm.sln
